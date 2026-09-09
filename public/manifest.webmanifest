@@ -1,0 +1,38 @@
+{
+  "name": "Introit — proyeksi ibadat",
+  "short_name": "Introit",
+  "description": "Lirik, liturgi, dan doa di layar gereja. Berjalan di peramban dan bekerja tanpa internet.",
+  "id": "/",
+  "start_url": "/studio",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0A0B0E",
+  "theme_color": "#0A0B0E",
+  "lang": "id",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Meja operator",
+      "url": "/studio"
+    },
+    {
+      "name": "Layar keluaran",
+      "url": "/output"
+    }
+  ]
+}

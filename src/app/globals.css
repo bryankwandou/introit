@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+/* Tokens mirror brand.md. Change them there first, then here. */
+@theme {
+  --color-ink: #0a0b0e;
+  --color-panel: #131519;
+  --color-raised: #1b1e24;
+  --color-line: #262a32;
+  --color-muted: #8a9099;
+  --color-fg: #e7e9ec;
+  --color-gold: #d4a24c;
+  --color-gold-bright: #e9bc66;
+  --color-live: #c2413a;
+  --color-preview: #4a7fb5;
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-display), Georgia, serif;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The studio is a fixed-height workstation, not a scrolling document. */
+body:has(.studio-root) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-gold) 35%, transparent);
+}
+
+/* Thin, dark scrollbars — a bright default scrollbar is visible from the pews
+   when the operator's screen reflects off the glass of a projection booth. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 99px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #39404a;
+  background-clip: content-box;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes introit-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.rise {
+  animation: introit-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes introit-beam {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scaleY(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scaleY(1.04);
+  }
+}
