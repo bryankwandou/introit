@@ -7,7 +7,7 @@ import { useThemes } from "@/lib/hooks";
 import { useMediaUrl } from "@/lib/media";
 import { usePresenter } from "@/lib/store";
 import type { TextAlign, Theme, VerticalAlign } from "@/lib/types";
-import { SlideCanvas } from "@/components/SlideCanvas";
+import { DEFAULT_TRANSITION, SlideCanvas } from "@/components/SlideCanvas";
 import { Button, Field, Input, cn } from "@/components/ui";
 
 const FONTS = [
@@ -262,6 +262,16 @@ export function ThemeEditor() {
             max={90}
             suffix="%"
             onChange={(backgroundScrim) => patch({ backgroundScrim })}
+          />
+
+          <Slider
+            label="Peralihan salindia"
+            value={draft.transition ?? DEFAULT_TRANSITION}
+            min={0}
+            max={600}
+            step={20}
+            suffix=" ms"
+            onChange={(transition) => patch({ transition })}
           />
 
           <Field label="Perataan mendatar">

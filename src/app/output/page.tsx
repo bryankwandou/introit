@@ -56,6 +56,7 @@ export default function OutputPage() {
         backgroundUrl={background.url}
         backgroundMime={background.mime}
         playBackground
+        animate
         countdown={
           state.countdownTo
             ? { target: state.countdownTo, label: state.countdownLabel }

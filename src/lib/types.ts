@@ -110,6 +110,8 @@ export interface Theme {
   outline: number;
   /** Safe-area inset as a percentage of the shorter edge. */
   padding: number;
+  /** Cross-fade between slides in milliseconds; 0 cuts straight over. */
+  transition?: number;
   createdAt: number;
 }
 

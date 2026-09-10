@@ -29,6 +29,8 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
   BroadcastChannel.
 - **Monitor panggung** di `/stage` untuk pemusik dan lektor: bait yang tayang, bait
   berikutnya, jam dinding, dan tidak ada satu pun kendali.
+- **Peralihan salindia** yang menyilangkan bait lama dan baru, panjangnya diatur per
+  tema dan bisa dimatikan sama sekali untuk potong langsung.
 - **Hitung mundur pra-ibadat** yang memakai warna tema yang sedang dipakai.
 - **Impor dan ekspor OpenLyrics**, format terbuka yang dibaca OpenLP, ditambah cadangan
   lengkap dalam satu berkas JSON.

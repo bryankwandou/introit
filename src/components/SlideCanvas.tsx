@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import type { Theme } from "@/lib/types";
 import { Countdown } from "./Countdown";
 
@@ -17,8 +17,13 @@ interface Props {
   blackout?: boolean;
   /** Replaces the slide text with a pre-service clock while it is running. */
   countdown?: { target: number; label?: string };
+  /** Cross-fade text changes. Off in thumbnails, on wherever the slide is watched. */
+  animate?: boolean;
   className?: string;
 }
+
+/** Default cross-fade for themes saved before the setting existed. */
+export const DEFAULT_TRANSITION = 220;
 
 const justify = {
   top: "flex-start",
@@ -43,9 +48,36 @@ export function SlideCanvas({
   ticker,
   blackout,
   countdown,
+  animate,
   className,
 }: Props) {
   const isVideo = backgroundMime?.startsWith("video/") ?? false;
+  const fade = animate ? (theme.transition ?? DEFAULT_TRANSITION) : 0;
+
+  /**
+   * Keeps the outgoing line on screen for the length of the fade.
+   *
+   * A hard cut reads as a flicker from the back of a nave, so both lines are painted
+   * at once and the old one thins out under the new. The previous text is captured
+   * while rendering, which is the only moment its value is still known.
+   */
+  const [shown, setShown] = useState(text);
+  const [leaving, setLeaving] = useState<{ id: number; text: string } | null>(null);
+
+  if (shown !== text) {
+    setShown(text);
+    setLeaving(
+      fade && shown !== null
+        ? { id: (leaving?.id ?? 0) + 1, text: shown }
+        : null,
+    );
+  }
+
+  useEffect(() => {
+    if (!leaving) return;
+    const t = setTimeout(() => setLeaving(null), fade);
+    return () => clearTimeout(t);
+  }, [leaving, fade]);
 
   const shadow = theme.shadow
     ? `0 ${theme.shadow * 0.06}cqh ${theme.shadow * 0.14}cqh rgba(0,0,0,.72)`
@@ -111,7 +143,39 @@ export function SlideCanvas({
             theme={theme}
           />
         ) : (
-          text !== null && <div style={textStyle}>{text}</div>
+          <>
+            {leaving && (
+              <div
+                key={leaving.id}
+                aria-hidden
+                style={{
+                  ...textStyle,
+                  position: "absolute",
+                  inset: `${theme.padding}cqh ${theme.padding * 0.9}cqw`,
+                  display: "flex",
+                  alignItems: justify[theme.verticalAlign],
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  animation: `introit-leave ${fade}ms ease-out both`,
+                }}
+              >
+                {leaving.text}
+              </div>
+            )}
+            {text !== null && (
+              <div
+                key={text}
+                style={{
+                  ...textStyle,
+                  animation: fade
+                    ? `introit-enter ${fade}ms ease-out both`
+                    : undefined,
+                }}
+              >
+                {text}
+              </div>
+            )}
+          </>
         )}
       </div>
 

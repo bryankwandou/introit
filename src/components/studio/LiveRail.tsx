@@ -100,6 +100,7 @@ export function LiveRail({
             backgroundUrl={background.url}
             backgroundMime={background.mime}
             playBackground
+            animate
             countdown={
               countdownTo ? { target: countdownTo, label: countdownLabel } : undefined
             }
