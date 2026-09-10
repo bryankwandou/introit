@@ -18,6 +18,9 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
 - **Tata ibadat** dengan penyusunan ulang lewat seret-lepas dan catatan khusus operator.
 - **Tema** yang ukurannya dihitung sebagai persen tinggi layar, jadi pratinjau kecil sama
   persis dengan hasil di dinding gereja.
+- **Penyusun bacaan** yang membaca nomor ayat dari teks yang ditempel, memotong satu
+  ayat per salindia, dan memenggal kalimat kepanjangan di titik terdekat. Teks Alkitab
+  tidak ikut dibundel: paroki menempel terjemahan yang memang boleh mereka tayangkan.
 - **Latar foto dan video** yang disimpan sebagai blob di IndexedDB dan dipasang ke tema;
   jendela keluaran membaca berkasnya sendiri, jadi tidak ada video yang menyeberangi
   BroadcastChannel.
@@ -51,6 +54,7 @@ src/lib/slides.ts    penguraian bagian menjadi salindia
 src/lib/stage.ts     jembatan operator ke layar (BroadcastChannel + localStorage)
 src/lib/io.ts        impor/ekspor OpenLyrics dan cadangan
 src/lib/media.ts     penyimpanan blob latar dan object URL-nya
+src/lib/scripture.ts penguraian bacaan yang ditempel menjadi salindia
 src/lib/seed/        Ordinarium, doa harian, dan himne domain publik
 src/components/      SlideCanvas, meja operator, halaman depan
 ```

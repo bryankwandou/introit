@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpen,
   CloudOff,
   FileDown,
   Film,
@@ -37,6 +38,11 @@ const FEATURES = [
     icon: Search,
     title: "Pencarian sampai ke baris",
     body: "Operator jarang ingat judul lengkap. Kotak cari menyisir judul, penulis, label, dan seluruh badan lirik sekaligus.",
+  },
+  {
+    icon: BookOpen,
+    title: "Bacaan dipotong sendiri",
+    body: "Tempel bacaan dari lembar liturgi. Nomor ayat dikenali, satu ayat jadi satu salindia, dan kalimat yang kepanjangan dipenggal di titik, bukan di tengah kata.",
   },
   {
     icon: Film,

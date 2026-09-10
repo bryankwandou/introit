@@ -29,7 +29,7 @@ const GROUPS: { title: string; rows: [string, string[]][] }[] = [
     title: "Bekerja",
     rows: [
       ["Lompat ke pencarian", ["/"]],
-      ["Ganti panel kiri", ["Tab"]],
+      ["Putar panel kiri", ["Tab"]],
       ["Daftar pintasan ini", ["?"]],
       ["Tutup apa pun yang terbuka", ["Esc"]],
     ],

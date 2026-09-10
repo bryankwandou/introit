@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { DEFAULT_THEME_ID } from "./seed";
 
-export type PaneTab = "library" | "setlist" | "media";
+export type PaneTab = "library" | "setlist" | "reading" | "media";
 
 interface PresenterState {
   tab: PaneTab;

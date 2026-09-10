@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
+  BookOpen,
   Database,
   ExternalLink,
   ImageIcon,
@@ -27,6 +28,7 @@ import { ItemEditor } from "./ItemEditor";
 import { LibraryPane } from "./LibraryPane";
 import { LiveRail } from "./LiveRail";
 import { MediaPane } from "./MediaPane";
+import { ReadingPane } from "./ReadingPane";
 import { SetlistPane } from "./SetlistPane";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
 import { SlideDeck } from "./SlideDeck";
@@ -250,7 +252,7 @@ export function Studio() {
           break;
         case "Tab": {
           e.preventDefault();
-          const order = ["setlist", "library", "media"] as const;
+          const order = ["setlist", "library", "reading", "media"] as const;
           setTab(order[(order.indexOf(tab) + 1) % order.length]);
           break;
         }
@@ -406,6 +408,7 @@ export function Studio() {
               [
                 ["setlist", "Ibadat", ListMusic],
                 ["library", "Pustaka", Library],
+                ["reading", "Bacaan", BookOpen],
                 ["media", "Latar", ImageIcon],
               ] as const
             ).map(([key, label, Icon]) => (
@@ -413,7 +416,7 @@ export function Studio() {
                 key={key}
                 onClick={() => setTab(key)}
                 className={cn(
-                  "flex flex-1 cursor-pointer items-center justify-center gap-2 py-2.5 font-mono text-[10px] tracking-wider uppercase transition-colors",
+                  "flex flex-1 cursor-pointer items-center justify-center gap-1.5 px-1 py-2.5 font-mono text-[10px] tracking-wide uppercase transition-colors",
                   tab === key
                     ? "border-b-2 border-gold text-gold"
                     : "border-b-2 border-transparent text-muted hover:text-fg",
@@ -427,6 +430,9 @@ export function Studio() {
           <div className="min-h-0 flex-1">
             {tab === "setlist" && <SetlistPane />}
             {tab === "library" && <LibraryPane onAddToSetlist={addToSetlist} />}
+            {tab === "reading" && (
+              <ReadingPane onAddToSetlist={addToSetlist} />
+            )}
             {tab === "media" && <MediaPane />}
           </div>
         </aside>
