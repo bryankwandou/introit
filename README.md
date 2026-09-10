@@ -18,6 +18,12 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
 - **Tata ibadat** dengan penyusunan ulang lewat seret-lepas dan catatan khusus operator.
 - **Tema** yang ukurannya dihitung sebagai persen tinggi layar, jadi pratinjau kecil sama
   persis dengan hasil di dinding gereja.
+- **Latar foto dan video** yang disimpan sebagai blob di IndexedDB dan dipasang ke tema;
+  jendela keluaran membaca berkasnya sendiri, jadi tidak ada video yang menyeberangi
+  BroadcastChannel.
+- **Monitor panggung** di `/stage` untuk pemusik dan lektor: bait yang tayang, bait
+  berikutnya, jam dinding, dan tidak ada satu pun kendali.
+- **Hitung mundur pra-ibadat** yang memakai warna tema yang sedang dipakai.
 - **Impor dan ekspor OpenLyrics**, format terbuka yang dibaca OpenLP, ditambah cadangan
   lengkap dalam satu berkas JSON.
 - **Pintasan papan tik** ala perangkat lunak desktop: spasi maju, panah mundur, `B`
@@ -34,6 +40,7 @@ npm run dev
 - `/` — halaman depan
 - `/studio` — meja operator
 - `/output` — layar yang dilihat umat
+- `/stage` — monitor yang menghadap pemusik
 
 ## Bentuk kode
 
@@ -43,6 +50,7 @@ src/lib/db.ts        skema IndexedDB (Dexie)
 src/lib/slides.ts    penguraian bagian menjadi salindia
 src/lib/stage.ts     jembatan operator ke layar (BroadcastChannel + localStorage)
 src/lib/io.ts        impor/ekspor OpenLyrics dan cadangan
+src/lib/media.ts     penyimpanan blob latar dan object URL-nya
 src/lib/seed/        Ordinarium, doa harian, dan himne domain publik
 src/components/      SlideCanvas, meja operator, halaman depan
 ```

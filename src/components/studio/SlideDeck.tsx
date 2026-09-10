@@ -12,12 +12,20 @@ import { useState } from "react";
 interface Props {
   item?: LibraryItem;
   theme: Theme;
+  /** Resolved object URL for the theme background, shared by every thumbnail. */
+  background: { url?: string; mime?: string };
   /** Slide index that is on the projector, or -1 when this item is not live. */
   liveIndex: number;
   onGoLive: (index: number) => void;
 }
 
-export function SlideDeck({ item, theme, liveIndex, onGoLive }: Props) {
+export function SlideDeck({
+  item,
+  theme,
+  background,
+  liveIndex,
+  onGoLive,
+}: Props) {
   const { cursor, setCursor, setEditing } = usePresenter();
   const [dense, setDense] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -110,6 +118,8 @@ export function SlideDeck({ item, theme, liveIndex, onGoLive }: Props) {
                 <SlideCanvas
                   text={slide.text}
                   theme={theme}
+                  backgroundUrl={background.url}
+                  backgroundMime={background.mime}
                   className={cn(
                     dense ? "aspect-video w-40 shrink-0" : "aspect-video w-full",
                   )}

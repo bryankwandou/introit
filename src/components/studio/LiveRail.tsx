@@ -8,6 +8,7 @@ import {
   MonitorOff,
   Palette,
   SquareSlash,
+  Timer,
 } from "lucide-react";
 import { SlideCanvas } from "@/components/SlideCanvas";
 import { Button, Kbd, PaneTitle, cn } from "@/components/ui";
@@ -18,6 +19,7 @@ import type { Theme } from "@/lib/types";
 
 interface Props {
   theme: Theme;
+  background: { url?: string; mime?: string };
   live: ResolvedSlide | null;
   next: ResolvedSlide | null;
   position: { index: number; total: number } | null;
@@ -25,7 +27,15 @@ interface Props {
   onNext: () => void;
 }
 
-export function LiveRail({ theme, live, next, position, onPrev, onNext }: Props) {
+export function LiveRail({
+  theme,
+  background,
+  live,
+  next,
+  position,
+  onPrev,
+  onNext,
+}: Props) {
   const {
     blackout,
     toggleBlackout,
@@ -40,6 +50,11 @@ export function LiveRail({ theme, live, next, position, onPrev, onNext }: Props)
     tickerOn,
     setTicker,
     toggleTicker,
+    countdownTo,
+    countdownLabel,
+    startCountdown,
+    stopCountdown,
+    setCountdownLabel,
   } = usePresenter();
   const themes = useThemes();
 
@@ -77,6 +92,12 @@ export function LiveRail({ theme, live, next, position, onPrev, onNext }: Props)
           <SlideCanvas
             text={cleared ? null : live.text}
             theme={theme}
+            backgroundUrl={background.url}
+            backgroundMime={background.mime}
+            playBackground
+            countdown={
+              countdownTo ? { target: countdownTo, label: countdownLabel } : undefined
+            }
             ticker={tickerOn ? ticker : undefined}
             blackout={blackout}
             className="aspect-video w-full"
@@ -127,6 +148,8 @@ export function LiveRail({ theme, live, next, position, onPrev, onNext }: Props)
             <SlideCanvas
               text={next?.text ?? null}
               theme={theme}
+              backgroundUrl={background.url}
+              backgroundMime={background.mime}
               className="aspect-video w-full opacity-80"
             />
           </div>
@@ -170,6 +193,39 @@ export function LiveRail({ theme, live, next, position, onPrev, onNext }: Props)
               </button>
             ))}
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted uppercase">
+              <Timer className="size-3" /> Hitung mundur
+            </span>
+            {countdownTo && (
+              <button
+                onClick={stopCountdown}
+                className="cursor-pointer font-mono text-[10px] text-live hover:brightness-125"
+              >
+                hentikan
+              </button>
+            )}
+          </div>
+          <div className="flex gap-1.5">
+            {[5, 10, 15, 30].map((m) => (
+              <button
+                key={m}
+                onClick={() => startCountdown(m)}
+                className="flex-1 cursor-pointer rounded-md border border-line py-1.5 font-mono text-[11px] text-muted transition-colors hover:border-gold hover:text-gold"
+              >
+                {m}m
+              </button>
+            ))}
+          </div>
+          <input
+            value={countdownLabel}
+            onChange={(e) => setCountdownLabel(e.target.value)}
+            placeholder="Keterangan di bawah angka"
+            className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-xs text-fg placeholder:text-muted/70 focus:border-gold focus:outline-none"
+          />
         </div>
 
         <div className="space-y-1.5">

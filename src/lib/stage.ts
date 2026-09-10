@@ -1,5 +1,7 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
+
 import type { StageState } from "./types";
 
 const CHANNEL = "introit:stage";
@@ -71,13 +73,59 @@ export class StageLink {
   }
 }
 
+/* ------------------------------------------------------- receiving side */
+
+/**
+ * One link per window, shared by every component that paints a frame.
+ *
+ * The audience and monitor pages are read-only subscribers, so the frame lives outside
+ * React and reaches it through useSyncExternalStore: no effect writes state, and a
+ * window opened halfway through the service paints the stored frame on its first pass.
+ */
+let receiver: StageLink | null = null;
+let latest: StageState | null = null;
+const watchers = new Set<() => void>();
+
+function attach(): void {
+  if (receiver) return;
+  receiver = new StageLink();
+  latest = receiver.readSnapshot();
+  receiver.subscribe((frame) => {
+    latest = frame;
+    watchers.forEach((notify) => notify());
+  });
+  receiver.requestSnapshot();
+}
+
+function subscribeToStage(notify: () => void): () => void {
+  attach();
+  watchers.add(notify);
+  return () => {
+    watchers.delete(notify);
+    if (watchers.size === 0) {
+      receiver?.close();
+      receiver = null;
+    }
+  };
+}
+
+const readLatest = () => latest;
+const readNothing = () => null;
+
+/** The frame the operator last published, or null before one arrives. */
+export function useStageState(): StageState | null {
+  return useSyncExternalStore(subscribeToStage, readLatest, readNothing);
+}
+
 /**
  * Opens the audience window. Tries the Window Management API first so the window lands
  * on the projector without the operator dragging it; falls back to a plain popup that
  * they can throw fullscreen with F11.
  */
-export async function openOutputWindow(): Promise<Window | null> {
-  const url = "/output";
+export async function openOutputWindow(
+  url: "/output" | "/stage" = "/output",
+): Promise<Window | null> {
+  const name = url === "/stage" ? "introit-stage" : "introit-output";
 
   interface ScreenDetailed extends Screen {
     isPrimary: boolean;
@@ -98,7 +146,7 @@ export async function openOutputWindow(): Promise<Window | null> {
       if (external) {
         return window.open(
           url,
-          "introit-output",
+          name,
           `left=${external.left},top=${external.top},width=${external.width},height=${external.height}`,
         );
       }
@@ -107,5 +155,5 @@ export async function openOutputWindow(): Promise<Window | null> {
     }
   }
 
-  return window.open(url, "introit-output", "width=1280,height=720");
+  return window.open(url, name, "width=1280,height=720");
 }

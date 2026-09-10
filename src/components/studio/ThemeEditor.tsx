@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Copy, Trash2, X } from "lucide-react";
 import { db, uid } from "@/lib/db";
 import { useThemes } from "@/lib/hooks";
+import { useMediaUrl } from "@/lib/media";
 import { usePresenter } from "@/lib/store";
 import type { TextAlign, Theme, VerticalAlign } from "@/lib/types";
 import { SlideCanvas } from "@/components/SlideCanvas";
@@ -65,12 +66,18 @@ export function ThemeEditor() {
   const { editingTheme, setEditingTheme, setTheme } = usePresenter();
   const themes = useThemes();
   const [draft, setDraft] = useState<Theme | null>(null);
+  const [loadedFor, setLoadedFor] = useState<string | undefined>(undefined);
+  const background = useMediaUrl(draft?.backgroundMediaId);
 
-  useEffect(() => {
-    if (!editingTheme) return setDraft(null);
+  // Same reasoning as the item drawer: the copy is taken while rendering, so the
+  // sliders never show the previous theme's numbers for a frame.
+  if (loadedFor !== editingTheme) {
+    setLoadedFor(editingTheme);
+    setDraft(null);
+  } else if (editingTheme && !draft) {
     const found = themes?.find((t) => t.id === editingTheme);
     if (found) setDraft({ ...found });
-  }, [editingTheme, themes]);
+  }
 
   if (!editingTheme || !draft) return null;
 
@@ -144,7 +151,14 @@ export function ThemeEditor() {
 
         <div className="shrink-0 border-b border-line p-4">
           <div className="overflow-hidden rounded-lg border border-line">
-            <SlideCanvas text={SAMPLE} theme={draft} className="aspect-video w-full" />
+            <SlideCanvas
+              text={SAMPLE}
+              theme={draft}
+              backgroundUrl={background.url}
+              backgroundMime={background.mime}
+              playBackground
+              className="aspect-video w-full"
+            />
           </div>
         </div>
 

@@ -137,4 +137,13 @@ export interface StageState {
   /** Black the output entirely, above everything. */
   blackout: boolean;
   logoBlank: boolean;
+  /** Epoch ms the pre-service countdown ends at. Absent means no countdown. */
+  countdownTo?: number;
+  /** Shown under the countdown, e.g. "Misa dimulai". */
+  countdownLabel?: string;
+  /** Title and slide tag, for the musicians' monitor only. */
+  nowTitle?: string;
+  nowTag?: string;
+  /** Text of the slide queued after the live one, for the monitor. */
+  nextText?: string | null;
 }

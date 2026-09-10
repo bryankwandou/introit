@@ -3,13 +3,16 @@ import {
   ArrowRight,
   CloudOff,
   FileDown,
+  Film,
   Keyboard,
   Layers,
   MonitorPlay,
+  MonitorSpeaker,
   Palette,
   ScrollText,
   Search,
   ShieldCheck,
+  Timer,
 } from "lucide-react";
 import { HeroStage } from "@/components/landing/HeroStage";
 import { Reveal } from "@/components/landing/Reveal";
@@ -34,6 +37,21 @@ const FEATURES = [
     icon: Search,
     title: "Pencarian sampai ke baris",
     body: "Operator jarang ingat judul lengkap. Kotak cari menyisir judul, penulis, label, dan seluruh badan lirik sekaligus.",
+  },
+  {
+    icon: Film,
+    title: "Latar foto dan video",
+    body: "Seret berkas ke panel Latar, lalu pasangkan ke tema. Video berputar sendiri di proyektor, dan peredupnya bisa dinaikkan supaya lirik tetap terbaca.",
+  },
+  {
+    icon: MonitorSpeaker,
+    title: "Monitor untuk pemusik",
+    body: "Jendela terpisah menghadap koor: bait yang sedang tayang, bait berikutnya, dan jam dinding. Umat tidak melihatnya, dan tidak ada tombol yang bisa tersenggol.",
+  },
+  {
+    icon: Timer,
+    title: "Hitung mundur sebelum ibadat",
+    body: "Lima sampai tiga puluh menit, tampil memakai warna tema yang sama sehingga tidak menyilaukan saat lampu gereja masih redup.",
   },
   {
     icon: Palette,
@@ -82,6 +100,8 @@ const COMPARE: [string, string, string][] = [
   ["Bekerja tanpa internet", "Ya", "Ya"],
   ["Sistem operasi", "Terikat Windows atau macOS", "Apa pun yang punya peramban"],
   ["Memindahkan pustaka", "Ekspor khusus", "OpenLyrics dan cadangan JSON"],
+  ["Latar video", "Ada", "Ada, diputar dari berkas di perangkat"],
+  ["Monitor pemusik", "Umumnya fitur berbayar", "Termasuk"],
 ];
 
 const FAQ = [

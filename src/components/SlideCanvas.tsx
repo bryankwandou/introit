@@ -2,14 +2,21 @@
 
 import type { CSSProperties } from "react";
 import type { Theme } from "@/lib/types";
+import { Countdown } from "./Countdown";
 
 interface Props {
   text: string | null;
   theme: Theme;
   /** Painted behind the text; an object URL for a media asset. */
   backgroundUrl?: string;
+  /** Mime of the asset above, so a video loops instead of failing to paint. */
+  backgroundMime?: string;
+  /** Thumbnails leave video paused; only the projector and live pane play it. */
+  playBackground?: boolean;
   ticker?: string;
   blackout?: boolean;
+  /** Replaces the slide text with a pre-service clock while it is running. */
+  countdown?: { target: number; label?: string };
   className?: string;
 }
 
@@ -31,10 +38,15 @@ export function SlideCanvas({
   text,
   theme,
   backgroundUrl,
+  backgroundMime,
+  playBackground,
   ticker,
   blackout,
+  countdown,
   className,
 }: Props) {
+  const isVideo = backgroundMime?.startsWith("video/") ?? false;
+
   const shadow = theme.shadow
     ? `0 ${theme.shadow * 0.06}cqh ${theme.shadow * 0.14}cqh rgba(0,0,0,.72)`
     : undefined;
@@ -60,7 +72,18 @@ export function SlideCanvas({
       className={`relative overflow-hidden ${className ?? ""}`}
       style={{ containerType: "size", background: theme.background }}
     >
-      {backgroundUrl && (
+      {backgroundUrl && isVideo && (
+        <video
+          key={backgroundUrl}
+          src={backgroundUrl}
+          className="absolute inset-0 size-full object-cover"
+          autoPlay={playBackground}
+          loop
+          muted
+          playsInline
+        />
+      )}
+      {backgroundUrl && !isVideo && (
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${backgroundUrl})` }}
@@ -81,7 +104,15 @@ export function SlideCanvas({
           justifyContent: "center",
         }}
       >
-        {text !== null && <div style={textStyle}>{text}</div>}
+        {countdown ? (
+          <Countdown
+            target={countdown.target}
+            label={countdown.label}
+            theme={theme}
+          />
+        ) : (
+          text !== null && <div style={textStyle}>{text}</div>
+        )}
       </div>
 
       {ticker && (

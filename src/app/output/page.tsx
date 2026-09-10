@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { SlideCanvas } from "@/components/SlideCanvas";
-import { StageLink } from "@/lib/stage";
+import { useMediaUrl } from "@/lib/media";
+import { useStageState } from "@/lib/stage";
 import { DEFAULT_THEMES } from "@/lib/seed";
 import type { StageState } from "@/lib/types";
 
@@ -20,27 +21,17 @@ const IDLE: StageState = {
  * fire by accident, no network. It listens and it paints.
  */
 export default function OutputPage() {
-  const [state, setState] = useState<StageState>(IDLE);
+  const state = useStageState() ?? IDLE;
   const [showHint, setShowHint] = useState(true);
-  const linkRef = useRef<StageLink | null>(null);
+  // The frame carries only the theme; the bytes are read straight from the same
+  // IndexedDB, so a 40 MB loop never crosses BroadcastChannel.
+  const background = useMediaUrl(state.theme.backgroundMediaId);
 
   useEffect(() => {
-    const link = new StageLink();
-    linkRef.current = link;
-
-    const snap = link.readSnapshot();
-    if (snap) setState(snap);
-
-    const off = link.subscribe(setState);
-    link.requestSnapshot();
-
     document.title = "Introit — Layar";
     document.body.style.cursor = "none";
     document.body.style.background = "#000";
-
     return () => {
-      off();
-      link.close();
       document.body.style.cursor = "";
     };
   }, []);
@@ -62,6 +53,14 @@ export default function OutputPage() {
       <SlideCanvas
         text={state.visible ? state.text : null}
         theme={state.theme}
+        backgroundUrl={background.url}
+        backgroundMime={background.mime}
+        playBackground
+        countdown={
+          state.countdownTo
+            ? { target: state.countdownTo, label: state.countdownLabel }
+            : undefined
+        }
         ticker={state.ticker}
         blackout={state.blackout}
         className="h-full w-full"

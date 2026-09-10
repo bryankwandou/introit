@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { DEFAULT_THEME_ID } from "./seed";
 
-export type PaneTab = "library" | "setlist";
+export type PaneTab = "library" | "setlist" | "media";
 
 interface PresenterState {
   tab: PaneTab;
@@ -22,6 +22,9 @@ interface PresenterState {
   logoBlank: boolean;
   ticker: string;
   tickerOn: boolean;
+  /** Epoch ms the pre-service clock ends at; undefined once it is dismissed. */
+  countdownTo?: number;
+  countdownLabel: string;
   search: string;
   /** Item id open in the editor drawer, or "new" for a blank one. */
   editing?: string;
@@ -40,6 +43,9 @@ interface PresenterState {
   toggleLogoBlank: () => void;
   setTicker: (t: string) => void;
   toggleTicker: () => void;
+  startCountdown: (minutes: number) => void;
+  stopCountdown: () => void;
+  setCountdownLabel: (label: string) => void;
   setSearch: (s: string) => void;
   setEditing: (id?: string) => void;
   setEditingTheme: (id?: string) => void;
@@ -55,6 +61,7 @@ export const usePresenter = create<PresenterState>((set) => ({
   logoBlank: false,
   ticker: "",
   tickerOn: false,
+  countdownLabel: "Misa segera dimulai",
   search: "",
   showShortcuts: false,
 
@@ -71,6 +78,10 @@ export const usePresenter = create<PresenterState>((set) => ({
   toggleLogoBlank: () => set((s) => ({ logoBlank: !s.logoBlank })),
   setTicker: (ticker) => set({ ticker }),
   toggleTicker: () => set((s) => ({ tickerOn: !s.tickerOn })),
+  startCountdown: (minutes) =>
+    set({ countdownTo: Date.now() + Math.round(minutes * 60_000) }),
+  stopCountdown: () => set({ countdownTo: undefined }),
+  setCountdownLabel: (countdownLabel) => set({ countdownLabel }),
   setSearch: (search) => set({ search }),
   setEditing: (editing) => set({ editing }),
   setEditingTheme: (editingTheme) => set({ editingTheme }),

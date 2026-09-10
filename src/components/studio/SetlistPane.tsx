@@ -15,6 +15,11 @@ import { usePresenter } from "@/lib/store";
 import type { Setlist } from "@/lib/types";
 import { Button, Empty, Input, PaneTitle, cn } from "@/components/ui";
 
+/** Stamps the edit time on every write, so the rundown list can sort by recency. */
+async function persist(next: Setlist) {
+  await db.setlists.put({ ...next, updatedAt: Date.now() });
+}
+
 export function SetlistPane() {
   const setlists = useSetlists();
   const { activeSetlistId, openSetlist, activeItemId, openItem, liveItemId } =
@@ -25,10 +30,6 @@ export function SetlistPane() {
   const [noteFor, setNoteFor] = useState<string | null>(null);
 
   const byId = new Map((items ?? []).map((i) => [i.id, i]));
-
-  const persist = async (next: Setlist) => {
-    await db.setlists.put({ ...next, updatedAt: Date.now() });
-  };
 
   const createSetlist = async () => {
     const name = prompt("Nama tata ibadat", "Misa Hari Minggu");

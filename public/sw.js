@@ -5,8 +5,15 @@
  * as the operator is online again. Everything else is stale-while-revalidate: the
  * projector never waits on a font or a chunk that the cache already holds.
  */
-const CACHE = "introit-v1";
-const SHELL = ["/", "/studio", "/output", "/manifest.webmanifest", "/mark.svg"];
+const CACHE = "introit-v2";
+const SHELL = [
+  "/",
+  "/studio",
+  "/output",
+  "/stage",
+  "/manifest.webmanifest",
+  "/mark.svg",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

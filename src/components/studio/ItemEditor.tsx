@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Download, Plus, Trash2, X } from "lucide-react";
 import { db, uid } from "@/lib/db";
 import { download, toOpenLyrics } from "@/lib/io";
@@ -38,12 +38,16 @@ export function ItemEditor() {
   const { editing, setEditing, openItem } = usePresenter();
   const stored = useItem(editing === "new" ? undefined : editing);
   const [draft, setDraft] = useState<LibraryItem | null>(null);
+  const [loadedFor, setLoadedFor] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (!editing) return setDraft(null);
-    if (editing === "new") return setDraft(blankItem());
-    if (stored) setDraft(structuredClone(stored));
-  }, [editing, stored]);
+  // Seeding the draft while rendering, rather than after it, means the drawer never
+  // paints one frame of the previous song before the right one lands.
+  if (loadedFor !== editing) {
+    setLoadedFor(editing);
+    setDraft(editing === "new" ? blankItem() : null);
+  } else if (editing && editing !== "new" && !draft && stored) {
+    setDraft(structuredClone(stored));
+  }
 
   if (!editing || !draft) return null;
 

@@ -5,15 +5,18 @@ import Link from "next/link";
 import {
   Database,
   ExternalLink,
+  ImageIcon,
   Keyboard,
   Library,
   ListMusic,
   MonitorPlay,
+  MonitorSpeaker,
   Save,
 } from "lucide-react";
 import { db, uid } from "@/lib/db";
 import { download, exportBackup, importBackup } from "@/lib/io";
 import { useItem, useSeeded, useSetlist, useSetlists, useThemes } from "@/lib/hooks";
+import { useMediaUrl } from "@/lib/media";
 import { DEFAULT_THEMES } from "@/lib/seed";
 import { resolveSlides } from "@/lib/slides";
 import { StageLink, openOutputWindow } from "@/lib/stage";
@@ -23,6 +26,7 @@ import { Button, cn } from "@/components/ui";
 import { ItemEditor } from "./ItemEditor";
 import { LibraryPane } from "./LibraryPane";
 import { LiveRail } from "./LiveRail";
+import { MediaPane } from "./MediaPane";
 import { SetlistPane } from "./SetlistPane";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
 import { SlideDeck } from "./SlideDeck";
@@ -49,6 +53,8 @@ export function Studio() {
     logoBlank,
     ticker,
     tickerOn,
+    countdownTo,
+    countdownLabel,
     editing,
     editingTheme,
     toggleBlackout,
@@ -82,6 +88,7 @@ export function Studio() {
 
   const theme: Theme =
     themes?.find((t) => t.id === themeId) ?? DEFAULT_THEMES[0];
+  const background = useMediaUrl(theme.backgroundMediaId);
 
   const activeSlides = useMemo(
     () => (activeItem ? resolveSlides(activeItem) : []),
@@ -120,9 +127,25 @@ export function Studio() {
       ticker: tickerOn && ticker.trim() ? ticker.trim() : undefined,
       blackout,
       logoBlank,
+      countdownTo,
+      countdownLabel,
+      nowTitle: liveItem?.title,
+      nowTag: liveSlide?.tag,
+      nextText: nextSlide?.text ?? null,
     };
     linkRef.current?.send(frame);
-  }, [liveSlide, theme, ticker, tickerOn, blackout, logoBlank]);
+  }, [
+    liveSlide,
+    nextSlide,
+    liveItem,
+    theme,
+    ticker,
+    tickerOn,
+    blackout,
+    logoBlank,
+    countdownTo,
+    countdownLabel,
+  ]);
 
   /* -------------------------------------------------------------- commands */
 
@@ -225,10 +248,12 @@ export function Studio() {
           e.preventDefault();
           goLiveHere(0);
           break;
-        case "Tab":
+        case "Tab": {
           e.preventDefault();
-          setTab(tab === "library" ? "setlist" : "library");
+          const order = ["setlist", "library", "media"] as const;
+          setTab(order[(order.indexOf(tab) + 1) % order.length]);
           break;
+        }
         case "/":
           e.preventDefault();
           setTab("library");
@@ -254,6 +279,9 @@ export function Studio() {
               break;
             case "o":
               void openOutputWindow();
+              break;
+            case "s":
+              void openOutputWindow("/stage");
               break;
           }
       }
@@ -351,6 +379,14 @@ export function Studio() {
           >
             <Keyboard className="size-4" />
           </Button>
+          <Button
+            variant="ghost"
+            className="px-2.5"
+            title="Buka monitor panggung untuk pemusik"
+            onClick={() => void openOutputWindow("/stage")}
+          >
+            <MonitorSpeaker className="size-4" />
+          </Button>
           <Link href="/output" target="_blank" className="hidden sm:block">
             <Button variant="ghost" className="px-2.5" title="Buka di tab baru">
               <ExternalLink className="size-4" />
@@ -368,8 +404,9 @@ export function Studio() {
           <div className="flex shrink-0 border-b border-line">
             {(
               [
-                ["setlist", "Tata Ibadat", ListMusic],
+                ["setlist", "Ibadat", ListMusic],
                 ["library", "Pustaka", Library],
+                ["media", "Latar", ImageIcon],
               ] as const
             ).map(([key, label, Icon]) => (
               <button
@@ -388,11 +425,9 @@ export function Studio() {
             ))}
           </div>
           <div className="min-h-0 flex-1">
-            {tab === "setlist" ? (
-              <SetlistPane />
-            ) : (
-              <LibraryPane onAddToSetlist={addToSetlist} />
-            )}
+            {tab === "setlist" && <SetlistPane />}
+            {tab === "library" && <LibraryPane onAddToSetlist={addToSetlist} />}
+            {tab === "media" && <MediaPane />}
           </div>
         </aside>
 
@@ -400,6 +435,7 @@ export function Studio() {
           <SlideDeck
             item={activeItem}
             theme={theme}
+            background={background}
             liveIndex={liveItem?.id === activeItem?.id ? liveIndex : -1}
             onGoLive={goLiveHere}
           />
@@ -408,6 +444,7 @@ export function Studio() {
         <aside className="min-h-0 border-l border-line bg-panel">
           <LiveRail
             theme={theme}
+            background={background}
             live={liveSlide}
             next={nextSlide}
             position={
