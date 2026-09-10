@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Download, Plus, Trash2, X } from "lucide-react";
 import { db, uid } from "@/lib/db";
 import { download, toOpenLyrics } from "@/lib/io";
-import { useItem } from "@/lib/hooks";
+import { useItem, useThemes } from "@/lib/hooks";
 import { sectionTag, slidesToText, textToSlides } from "@/lib/slides";
 import { usePresenter } from "@/lib/store";
 import {
@@ -37,6 +37,7 @@ const SECTION_KINDS: SectionKind[] = [
 export function ItemEditor() {
   const { editing, setEditing, openItem } = usePresenter();
   const stored = useItem(editing === "new" ? undefined : editing);
+  const themes = useThemes();
   const [draft, setDraft] = useState<LibraryItem | null>(null);
   const [loadedFor, setLoadedFor] = useState<string | undefined>(undefined);
 
@@ -225,6 +226,26 @@ export function ItemEditor() {
               />
             </Field>
           </div>
+
+          <Field
+            label="Tema"
+            hint="Butir ini boleh tampil beda dari sisa ibadat — misalnya Bunda Maria di atas foto biru."
+          >
+            <select
+              value={draft.themeId ?? ""}
+              onChange={(e) =>
+                patch({ themeId: e.target.value || undefined })
+              }
+              className="w-full cursor-pointer rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-gold"
+            >
+              <option value="">Ikut tema ibadat</option>
+              {(themes ?? []).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                </option>
+              ))}
+            </select>
+          </Field>
 
           <Field
             label="Urutan tayang"

@@ -23,6 +23,10 @@ interface Props {
   live: ResolvedSlide | null;
   next: ResolvedSlide | null;
   position: { index: number; total: number } | null;
+  /** Set when the live piece carries its own theme, overriding the picker below. */
+  override?: string;
+  /** Picking a theme also writes it onto the rundown, so it survives a reload. */
+  onPickTheme: (id: string) => void;
   onPrev: () => void;
   onNext: () => void;
 }
@@ -33,6 +37,8 @@ export function LiveRail({
   live,
   next,
   position,
+  override,
+  onPickTheme,
   onPrev,
   onNext,
 }: Props) {
@@ -44,7 +50,6 @@ export function LiveRail({
     clear,
     liveIndex,
     themeId,
-    setTheme,
     setEditingTheme,
     ticker,
     tickerOn,
@@ -163,17 +168,25 @@ export function LiveRail({
               <Palette className="size-3" /> Tema
             </span>
             <button
-              onClick={() => setEditingTheme(themeId)}
+              onClick={() => setEditingTheme(theme.id)}
               className="cursor-pointer font-mono text-[10px] text-gold hover:text-gold-bright"
             >
               sunting
             </button>
           </div>
+
+          {override && (
+            <p className="rounded-md border border-line bg-ink px-2 py-1.5 font-mono text-[10px] leading-relaxed text-muted">
+              butir yang tayang memakai temanya sendiri:{" "}
+              <span className="text-gold">{override}</span>. pilihan di bawah
+              berlaku untuk butir lain.
+            </p>
+          )}
           <div className="grid grid-cols-3 gap-1.5">
             {(themes ?? []).map((t) => (
               <button
                 key={t.id}
-                onClick={() => setTheme(t.id)}
+                onClick={() => onPickTheme(t.id)}
                 title={t.name}
                 className={cn(
                   "cursor-pointer overflow-hidden rounded-md border transition-all",

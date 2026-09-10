@@ -88,8 +88,38 @@ export function Studio() {
     }
   }, [themes, themeId, setTheme]);
 
-  const theme: Theme =
-    themes?.find((t) => t.id === themeId) ?? DEFAULT_THEMES[0];
+  // The rundown remembers the look chosen last time it was open.
+  useEffect(() => {
+    const saved = setlist?.themeId;
+    if (saved && saved !== themeId && themes?.some((t) => t.id === saved)) {
+      setTheme(saved);
+    }
+  }, [setlist?.themeId, themes, themeId, setTheme]);
+
+  /**
+   * Which theme a piece wears.
+   *
+   * A song may carry its own look — a Marian hymn on a blue photograph while the rest
+   * of the service stays plain — and the rundown may set a look for the whole morning.
+   * The picker in the live rail is the fallback under both.
+   */
+  const themeFor = useCallback(
+    (item?: LibraryItem): Theme => {
+      const pick = (id?: string) =>
+        id ? themes?.find((t) => t.id === id) : undefined;
+      return (
+        pick(item?.themeId) ??
+        pick(setlist?.themeId) ??
+        pick(themeId) ??
+        DEFAULT_THEMES[0]
+      );
+    },
+    [themes, setlist?.themeId, themeId],
+  );
+
+  const deckTheme = themeFor(activeItem);
+  const theme = themeFor(liveItem);
+  const deckBackground = useMediaUrl(deckTheme.backgroundMediaId);
   const background = useMediaUrl(theme.backgroundMediaId);
 
   const activeSlides = useMemo(
@@ -162,6 +192,20 @@ export function Studio() {
       setTab("setlist");
     },
     [setlist, setTab],
+  );
+
+  /**
+   * The picker sets the look for the whole rundown, not just this sitting: a volunteer
+   * who chooses Prapaskah on Ash Wednesday should find it still chosen next Sunday.
+   */
+  const pickTheme = useCallback(
+    (id: string) => {
+      setTheme(id);
+      if (setlist) {
+        void db.setlists.put({ ...setlist, themeId: id, updatedAt: Date.now() });
+      }
+    },
+    [setTheme, setlist],
   );
 
   const goLiveHere = useCallback(
@@ -440,8 +484,8 @@ export function Studio() {
         <main className="min-h-0 bg-ink">
           <SlideDeck
             item={activeItem}
-            theme={theme}
-            background={background}
+            theme={deckTheme}
+            background={deckBackground}
             liveIndex={liveItem?.id === activeItem?.id ? liveIndex : -1}
             onGoLive={goLiveHere}
           />
@@ -458,6 +502,12 @@ export function Studio() {
                 ? { index: liveIndex, total: liveSlides.length }
                 : null
             }
+            override={
+              liveItem?.themeId && liveItem.themeId !== setlist?.themeId
+                ? theme.name
+                : undefined
+            }
+            onPickTheme={pickTheme}
             onPrev={() => advance(-1)}
             onNext={() => advance(1)}
           />

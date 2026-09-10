@@ -16,6 +16,9 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
   terpotong per salindia.
 - **Pustaka yang bisa dicari sampai ke baris lirik**, lengkap dengan label dan koleksi.
 - **Tata ibadat** dengan penyusunan ulang lewat seret-lepas dan catatan khusus operator.
+- **Tema per butir**: satu lagu boleh tampil di atas fotonya sendiri sementara sisa
+  ibadat tetap polos. Pilihan tema tersimpan di tata ibadat, jadi masih ada minggu
+  depan.
 - **Tema** yang ukurannya dihitung sebagai persen tinggi layar, jadi pratinjau kecil sama
   persis dengan hasil di dinding gereja.
 - **Penyusun bacaan** yang membaca nomor ayat dari teks yang ditempel, memotong satu
