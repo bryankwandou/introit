@@ -55,6 +55,8 @@ export function Studio() {
     logoBlank,
     ticker,
     tickerOn,
+    quick,
+    quickOn,
     countdownTo,
     countdownLabel,
     editing,
@@ -150,7 +152,8 @@ export function Studio() {
   }, []);
 
   useEffect(() => {
-    const text = logoBlank ? null : (liveSlide?.text ?? null);
+    const typed = quickOn && quick.trim() ? quick.trim() : null;
+    const text = typed ?? (logoBlank ? null : (liveSlide?.text ?? null));
     const frame: StageState = {
       revision: ++revision.current,
       visible: true,
@@ -161,8 +164,9 @@ export function Studio() {
       logoBlank,
       countdownTo,
       countdownLabel,
-      nowTitle: liveItem?.title,
-      nowTag: liveSlide?.tag,
+      // The stage monitor should name what the room is actually reading.
+      nowTitle: typed ? "Teks cepat" : liveItem?.title,
+      nowTag: typed ? undefined : liveSlide?.tag,
       nextText: nextSlide?.text ?? null,
     };
     linkRef.current?.send(frame);
@@ -173,6 +177,8 @@ export function Studio() {
     theme,
     ticker,
     tickerOn,
+    quick,
+    quickOn,
     blackout,
     logoBlank,
     countdownTo,
@@ -518,7 +524,13 @@ export function Studio() {
         <span className={cn(blackout && "text-live")}>
           {blackout ? "layar digelapkan" : "layar aktif"}
         </span>
-        <span>{liveItem ? liveItem.title : "belum ada yang tayang"}</span>
+        <span className={cn(quickOn && quick.trim() && "text-live")}>
+          {quickOn && quick.trim()
+            ? "teks cepat sedang tayang"
+            : liveItem
+              ? liveItem.title
+              : "belum ada yang tayang"}
+        </span>
         <span className="ml-auto hidden sm:inline">
           data tersimpan di peramban ini · tanpa sambungan internet
         </span>

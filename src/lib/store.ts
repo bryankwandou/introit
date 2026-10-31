@@ -22,6 +22,9 @@ interface PresenterState {
   logoBlank: boolean;
   ticker: string;
   tickerOn: boolean;
+  /** Typed straight onto the screen, ahead of whatever slide is live. */
+  quick: string;
+  quickOn: boolean;
   /** Epoch ms the pre-service clock ends at; undefined once it is dismissed. */
   countdownTo?: number;
   countdownLabel: string;
@@ -43,6 +46,9 @@ interface PresenterState {
   toggleLogoBlank: () => void;
   setTicker: (t: string) => void;
   toggleTicker: () => void;
+  setQuick: (t: string) => void;
+  showQuick: () => void;
+  hideQuick: () => void;
   startCountdown: (minutes: number) => void;
   stopCountdown: () => void;
   setCountdownLabel: (label: string) => void;
@@ -61,6 +67,8 @@ export const usePresenter = create<PresenterState>((set) => ({
   logoBlank: false,
   ticker: "",
   tickerOn: false,
+  quick: "",
+  quickOn: false,
   countdownLabel: "Misa segera dimulai",
   search: "",
   showShortcuts: false,
@@ -78,6 +86,11 @@ export const usePresenter = create<PresenterState>((set) => ({
   toggleLogoBlank: () => set((s) => ({ logoBlank: !s.logoBlank })),
   setTicker: (ticker) => set({ ticker }),
   toggleTicker: () => set((s) => ({ tickerOn: !s.tickerOn })),
+  setQuick: (quick) => set({ quick }),
+  // Showing it also lifts a blackout: an operator typing a car plate under pressure
+  // means "put this on the wall", not "put it behind a black rectangle".
+  showQuick: () => set({ quickOn: true, blackout: false }),
+  hideQuick: () => set({ quickOn: false }),
   startCountdown: (minutes) =>
     set({ countdownTo: Date.now() + Math.round(minutes * 60_000) }),
   stopCountdown: () => set({ countdownTo: undefined }),

@@ -32,6 +32,10 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
 - **Peralihan salindia** yang menyilangkan bait lama dan baru, panjangnya diatur per
   tema dan bisa dimatikan sama sekali untuk potong langsung.
 - **Hitung mundur pra-ibadat** yang memakai warna tema yang sedang dipakai.
+- **Teks cepat** untuk pengumuman mendadak di tengah ibadat, misalnya pemilik mobil yang
+  menghalangi jalan. Ketik, tekan `Ctrl+Enter`, dan teks itu menggantikan salindia sampai
+  `Esc` ditekan. Layar yang sedang gelap ikut terangkat, dan monitor panggung menamainya
+  "Teks cepat" supaya pemusik tidak mengira bait berikutnya hilang.
 - **Impor dan ekspor OpenLyrics**, format terbuka yang dibaca OpenLP, ditambah cadangan
   lengkap dalam satu berkas JSON.
 - **Pintasan papan tik** ala perangkat lunak desktop: spasi maju, panah mundur, `B`

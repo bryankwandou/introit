@@ -9,6 +9,7 @@ import {
   Palette,
   SquareSlash,
   Timer,
+  Type,
 } from "lucide-react";
 import { SlideCanvas } from "@/components/SlideCanvas";
 import { Button, Kbd, PaneTitle, cn } from "@/components/ui";
@@ -60,10 +61,18 @@ export function LiveRail({
     startCountdown,
     stopCountdown,
     setCountdownLabel,
+    quick,
+    quickOn,
+    setQuick,
+    showQuick,
+    hideQuick,
   } = usePresenter();
   const themes = useThemes();
 
   const cleared = liveIndex < 0 || !live;
+  // Mirrors the frame Studio publishes: typed text wins over whatever slide is live.
+  const typed = quickOn && quick.trim() ? quick.trim() : null;
+  const dark = blackout || (cleared && !typed);
 
   return (
     <div className="flex h-full flex-col">
@@ -80,7 +89,7 @@ export function LiveRail({
           <span
             className={cn(
               "size-2 rounded-full",
-              cleared || blackout ? "bg-line" : "animate-pulse bg-live",
+              dark ? "bg-line" : "animate-pulse bg-live",
             )}
           />
           Tayang
@@ -91,11 +100,11 @@ export function LiveRail({
         <div
           className={cn(
             "overflow-hidden rounded-lg border",
-            cleared || blackout ? "border-line" : "border-live/60",
+            dark ? "border-line" : "border-live/60",
           )}
         >
           <SlideCanvas
-            text={cleared ? null : live.text}
+            text={typed ?? (cleared || logoBlank ? null : live.text)}
             theme={theme}
             backgroundUrl={background.url}
             backgroundMime={background.mime}
@@ -163,6 +172,53 @@ export function LiveRail({
       </div>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto border-t border-line p-3">
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted uppercase">
+              <Type className="size-3" /> Teks cepat
+            </span>
+            {quickOn && (
+              <span className="font-mono text-[10px] text-live">sedang tayang</span>
+            )}
+          </div>
+          <textarea
+            value={quick}
+            onChange={(e) => setQuick(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                if (quick.trim()) showQuick();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                hideQuick();
+              }
+            }}
+            rows={2}
+            placeholder="Misal: Pemilik mobil B 1234 XY, mohon ke halaman depan."
+            className="w-full resize-none rounded-lg border border-line bg-ink px-3 py-2 text-xs text-fg placeholder:text-muted/70 focus:border-gold focus:outline-none"
+          />
+          <div className="flex gap-1.5">
+            <Button
+              variant={quickOn ? "live" : "outline"}
+              className="flex-1"
+              disabled={!quick.trim()}
+              onClick={showQuick}
+              title="Tayangkan teks ini menggantikan salindia (Ctrl+Enter)"
+            >
+              Tayangkan
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              disabled={!quickOn}
+              onClick={hideQuick}
+              title="Kembali ke salindia yang tayang (Esc)"
+            >
+              Turunkan
+            </Button>
+          </div>
+        </div>
+
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted uppercase">
