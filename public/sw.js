@@ -5,11 +5,12 @@
  * as the operator is online again. Everything else is stale-while-revalidate: the
  * projector never waits on a font or a chunk that the cache already holds.
  */
-const CACHE = "introit-v2";
+const CACHE = "introit-v3";
 const SHELL = [
   "/",
   "/studio",
   "/output",
+  "/output/kunci/hijau",
   "/stage",
   "/manifest.webmanifest",
   "/mark.svg",

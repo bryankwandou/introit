@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 import type { StageState } from "./types";
+import type { KeyName } from "./key";
 
 const CHANNEL = "introit:stage";
 /** Mirrored to localStorage so a window opened late paints immediately. */
@@ -123,8 +124,13 @@ export function useStageState(): StageState | null {
  * they can throw fullscreen with F11.
  */
 export async function openOutputWindow(
-  url: "/output" | "/stage" = "/output",
+  url: "/output" | "/stage" | `/output/kunci/${KeyName}` = "/output",
 ): Promise<Window | null> {
+  // The key feed is captured by OBS on the operator's own screen; it must never be
+  // thrown onto the projector the way the congregation's window is.
+  if (url.startsWith("/output/kunci/")) {
+    return window.open(url, "introit-key", "width=1280,height=720");
+  }
   const name = url === "/stage" ? "introit-stage" : "introit-output";
 
   interface ScreenDetailed extends Screen {

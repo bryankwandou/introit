@@ -19,6 +19,11 @@ interface Props {
   countdown?: { target: number; label?: string };
   /** Cross-fade text changes. Off in thumbnails, on wherever the slide is watched. */
   animate?: boolean;
+  /**
+   * Broadcast key: paint this flat colour instead of the theme's background so OBS or
+   * vMix can chroma-key it away and lay the words over the camera.
+   */
+  keyColor?: string;
   className?: string;
 }
 
@@ -49,6 +54,7 @@ export function SlideCanvas({
   blackout,
   countdown,
   animate,
+  keyColor,
   className,
 }: Props) {
   const isVideo = backgroundMime?.startsWith("video/") ?? false;
@@ -83,6 +89,13 @@ export function SlideCanvas({
     ? `0 ${theme.shadow * 0.06}cqh ${theme.shadow * 0.14}cqh rgba(0,0,0,.72)`
     : undefined;
 
+  // A keyer needs hard edges. A soft shadow blends into the key colour and leaves a
+  // tinted halo round every letter, so the key feed swaps it for a solid outline
+  // painted behind the glyph, which keeps the letters their full weight.
+  // Full stroke width in cqh; half sits under the glyph, so about 0.28cqh shows,
+  // roughly 3px on a 1080p feed — enough to hold over a bright camera picture.
+  const keyStroke = Math.max(theme.outline, 2) * 0.28;
+
   const textStyle: CSSProperties = {
     color: theme.color,
     fontFamily: `"${theme.fontFamily}", system-ui, sans-serif`,
@@ -91,10 +104,13 @@ export function SlideCanvas({
     lineHeight: theme.lineHeight,
     textAlign: theme.align,
     textTransform: theme.uppercase ? "uppercase" : "none",
-    textShadow: shadow,
-    WebkitTextStroke: theme.outline
-      ? `${theme.outline * 0.05}cqh rgba(0,0,0,.85)`
-      : undefined,
+    textShadow: keyColor ? undefined : shadow,
+    WebkitTextStroke: keyColor
+      ? `${keyStroke}cqh #000`
+      : theme.outline
+        ? `${theme.outline * 0.05}cqh rgba(0,0,0,.85)`
+        : undefined,
+    paintOrder: keyColor ? "stroke fill" : undefined,
     whiteSpace: "pre-wrap",
     textWrap: "balance",
   };
@@ -102,9 +118,10 @@ export function SlideCanvas({
   return (
     <div
       className={`relative overflow-hidden ${className ?? ""}`}
-      style={{ containerType: "size", background: theme.background }}
+      style={{ containerType: "size", background: keyColor ?? theme.background }}
     >
-      {backgroundUrl && isVideo && (
+      {/* A keyed feed carries words only: a photo behind them would cover the camera. */}
+      {backgroundUrl && !keyColor && isVideo && (
         <video
           key={backgroundUrl}
           src={backgroundUrl}
@@ -115,13 +132,13 @@ export function SlideCanvas({
           playsInline
         />
       )}
-      {backgroundUrl && !isVideo && (
+      {backgroundUrl && !keyColor && !isVideo && (
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${backgroundUrl})` }}
         />
       )}
-      {backgroundUrl && theme.backgroundScrim > 0 && (
+      {backgroundUrl && !keyColor && theme.backgroundScrim > 0 && (
         <div
           className="absolute inset-0 bg-black"
           style={{ opacity: theme.backgroundScrim / 100 }}
@@ -181,7 +198,8 @@ export function SlideCanvas({
 
       {ticker && (
         <div
-          className="absolute inset-x-0 bottom-0 truncate bg-black/55 px-[2cqw] py-[1.4cqh] backdrop-blur-sm"
+          // A see-through bar would mix with the key colour and leave a tinted band.
+          className={`absolute inset-x-0 bottom-0 truncate px-[2cqw] py-[1.4cqh] ${keyColor ? "bg-black" : "bg-black/55 backdrop-blur-sm"}`}
           style={{
             color: theme.color,
             fontFamily: `"${theme.fontFamily}", system-ui, sans-serif`,
@@ -192,7 +210,13 @@ export function SlideCanvas({
         </div>
       )}
 
-      {blackout && <div className="absolute inset-0 bg-black" />}
+      {/* On a keyed feed, "blackout" must clear the overlay, not black out the stream. */}
+      {blackout && (
+        <div
+          className="absolute inset-0 bg-black"
+          style={keyColor ? { background: keyColor } : undefined}
+        />
+      )}
     </div>
   );
 }

@@ -23,6 +23,7 @@ const GROUPS: { title: string; rows: [string, string[]][] }[] = [
       ["Sisakan latar saja", ["L"]],
       ["Buka jendela keluaran", ["O"]],
       ["Buka monitor panggung", ["S"]],
+      ["Buka keluaran siaran (kunci hijau)", ["K"]],
     ],
   },
   {

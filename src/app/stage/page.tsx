@@ -28,10 +28,6 @@ export default function StagePage() {
   const remaining = useRemaining(state.countdownTo);
 
   useEffect(() => {
-    document.title = "Introit — Monitor Panggung";
-  }, []);
-
-  useEffect(() => {
     const tick = () =>
       setClock(
         new Date().toLocaleTimeString("id-ID", {

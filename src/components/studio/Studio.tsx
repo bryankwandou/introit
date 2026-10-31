@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import {
   BookOpen,
+  Clapperboard,
   Database,
   ExternalLink,
   ImageIcon,
@@ -335,6 +336,9 @@ export function Studio() {
             case "s":
               void openOutputWindow("/stage");
               break;
+            case "k":
+              void openOutputWindow("/output/kunci/hijau");
+              break;
           }
       }
     };
@@ -438,6 +442,14 @@ export function Studio() {
             onClick={() => void openOutputWindow("/stage")}
           >
             <MonitorSpeaker className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            className="px-2.5"
+            title="Buka keluaran siaran berlatar hijau untuk OBS atau vMix (K)"
+            onClick={() => void openOutputWindow("/output/kunci/hijau")}
+          >
+            <Clapperboard className="size-4" />
           </Button>
           <Link href="/output" target="_blank" className="hidden sm:block">
             <Button variant="ghost" className="px-2.5" title="Buka di tab baru">

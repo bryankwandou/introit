@@ -38,6 +38,17 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
 - **Peralihan salindia** yang menyilangkan bait lama dan baru, panjangnya diatur per
   tema dan bisa dimatikan sama sekali untuk potong langsung.
 - **Hitung mundur pra-ibadat** yang memakai warna tema yang sedang dipakai.
+- **Keluaran siaran untuk OBS dan vMix.** Tombol papan klep di Studio (atau `K`) membuka
+  `/output/kunci/hijau`: salindia yang sama di atas hijau polos, tanpa foto latar. Di OBS,
+  tangkap jendela "Introit — Kunci siaran (hijau)" dengan *Window Capture*, lalu beri filter
+  *Chroma Key*. Lirik pun menempel di atas kamera misa. Huruf diberi tepi hitam tegas, bukan
+  bayangan lembut, supaya tidak menyisakan lingkaran kehijauan. Layar gelap (`B`) di jendela
+  ini mengosongkan lapisan lirik, bukan menghitamkan siaran. Kalau tema memakai huruf hijau,
+  pakai `/output/kunci/magenta` atau `/output/kunci/biru`.
+
+  OBS *Browser Source* tidak bisa dipakai: peramban bawaan OBS terpisah dari peramban
+  operator, jadi tidak pernah menerima salindia tanpa server perantara, dan Introit sengaja
+  tidak memakai server.
 - **Teks cepat** untuk pengumuman mendadak di tengah ibadat, misalnya pemilik mobil yang
   menghalangi jalan. Ketik, tekan `Ctrl+Enter`, dan teks itu menggantikan salindia sampai
   `Esc` ditekan. Layar yang sedang gelap ikut terangkat, dan monitor panggung menamainya
