@@ -3,15 +3,16 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect, useState } from "react";
 import { db } from "./db";
-import { seedIfEmpty } from "./seed";
+import { ensureSeed } from "./seed";
 import type { LibraryItem, Setlist, Theme } from "./types";
 
-/** Populates a fresh install, then reports when the studio may paint. */
+/** Populates a fresh install or tops up an old one, then reports when the studio may paint. */
 export function useSeeded() {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    seedIfEmpty()
-      .catch(() => {})
+    ensureSeed()
+      // A failed top-up must not keep the operator out of a service already under way.
+      .catch((err) => console.warn("Introit: pustaka bawaan tidak bisa diperbarui", err))
       .finally(() => setReady(true));
   }, []);
   return ready;

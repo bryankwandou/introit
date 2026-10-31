@@ -3,6 +3,7 @@ import { textToSlides } from "../slides";
 import type { ItemKind, LibraryItem, Setlist, Theme } from "../types";
 import { DEVOTION_SEED, LATIN_HYMN_SEED } from "./devotions";
 import { HYMN_SEED, LITURGY_SEED, type SeedEntry } from "./liturgy";
+import { MASS_RESPONSES_SEED } from "./responses";
 
 export const DEFAULT_THEME_ID = "theme-ink";
 
@@ -119,45 +120,94 @@ function toItem(entry: SeedEntry, kind: ItemKind): LibraryItem {
   };
 }
 
-/** Runs once on an empty database. Never overwrites what the parish has edited. */
-export async function seedIfEmpty(): Promise<void> {
-  const existing = await db.items.count();
-  if (existing > 0) return;
+/**
+ * Library content ships in numbered bundles. A fresh install takes all of them; an
+ * install that already has a library only takes bundles newer than the last one it
+ * recorded. That way a parish on an old copy still receives new prayers, while
+ * anything it edited or deliberately deleted from an earlier bundle stays as it left it.
+ */
+const BUNDLES: { version: number; items: () => LibraryItem[] }[] = [
+  {
+    version: 1,
+    items: () => [
+      ...LITURGY_SEED.map((e) => toItem(e, "liturgy")),
+      ...DEVOTION_SEED.map((e) => toItem(e, "liturgy")),
+      ...HYMN_SEED.map((e) => toItem(e, "song")),
+      ...LATIN_HYMN_SEED.map((e) => toItem(e, "song")),
+    ],
+  },
+  { version: 2, items: () => MASS_RESPONSES_SEED.map((e) => toItem(e, "liturgy")) },
+];
 
-  const themes = DEFAULT_THEMES.map((t) => ({ ...t, createdAt: Date.now() }));
-  const items = [
-    ...LITURGY_SEED.map((e) => toItem(e, "liturgy")),
-    ...DEVOTION_SEED.map((e) => toItem(e, "liturgy")),
-    ...HYMN_SEED.map((e) => toItem(e, "song")),
-    ...LATIN_HYMN_SEED.map((e) => toItem(e, "song")),
-  ];
+export const SEED_VERSION = BUNDLES[BUNDLES.length - 1].version;
+const SEED_KEY = "seedVersion";
 
-  const pick = (title: string) => items.find((i) => i.title === title)!.id;
-  const order = [
-    "Tanda Salib dan Salam",
-    "Pernyataan Tobat — Saya Mengaku",
-    "Tuhan Kasihanilah Kami",
-    "Kemuliaan",
-    "Syahadat Para Rasul",
-    "Kudus",
-    "Bapa Kami",
-    "Anak Domba Allah",
-    "Berkat dan Pengutusan",
-  ];
+/** The Sunday rundown a new install opens on: the Ordinary with the people's parts between. */
+const STARTER_ORDER = [
+  "Tanda Salib dan Salam",
+  "Pernyataan Tobat — Saya Mengaku",
+  "Tuhan Kasihanilah Kami",
+  "Kemuliaan",
+  "Jawaban Sesudah Bacaan",
+  "Bait Pengantar Injil",
+  "Pewartaan Injil — Pembuka dan Penutup",
+  "Syahadat Para Rasul",
+  "Doa Umat — Jawaban",
+  "Ajakan Berdoa atas Persembahan",
+  "Dialog Prefasi",
+  "Kudus",
+  "Aklamasi Anamnesis",
+  "Doksologi Penutup Doa Syukur Agung",
+  "Bapa Kami",
+  "Salam Damai",
+  "Anak Domba Allah",
+  "Ajakan Komuni — Saya Tidak Pantas",
+  "Berkat dan Pengutusan",
+];
 
-  const setlist: Setlist = {
-    id: uid(),
-    name: "Misa Hari Minggu",
-    date: new Date().toISOString().slice(0, 10),
-    entries: order.map((title) => ({ id: uid(), itemId: pick(title) })),
-    themeId: DEFAULT_THEME_ID,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
+/**
+ * Brings the library up to SEED_VERSION. Safe to call on every start: it runs inside
+ * one transaction, so two tabs opening at once cannot both add the same bundle.
+ * Returns how many items it added.
+ */
+export async function ensureSeed(): Promise<number> {
+  return db.transaction("rw", [db.items, db.themes, db.setlists, db.meta], async () => {
+    const recorded = (await db.meta.get(SEED_KEY))?.value;
+    const hasLibrary = (await db.items.count()) > 0;
 
-  await db.transaction("rw", db.items, db.themes, db.setlists, async () => {
-    await db.themes.bulkPut(themes);
-    await db.items.bulkPut(items);
-    await db.setlists.put(setlist);
+    // Installs from before bundles existed have a library but no record: they hold bundle 1.
+    const current = recorded ?? (hasLibrary ? 1 : 0);
+    if (current >= SEED_VERSION) return 0;
+
+    const fresh = BUNDLES.filter((b) => b.version > current).flatMap((b) => b.items());
+
+    if (current === 0) {
+      const themes = DEFAULT_THEMES.map((t) => ({ ...t, createdAt: Date.now() }));
+      const byTitle = new Map(fresh.map((i) => [i.title, i.id]));
+      const setlist: Setlist = {
+        id: uid(),
+        name: "Misa Hari Minggu",
+        date: new Date().toISOString().slice(0, 10),
+        entries: STARTER_ORDER.filter((t) => byTitle.has(t)).map((t) => ({
+          id: uid(),
+          itemId: byTitle.get(t)!,
+        })),
+        themeId: DEFAULT_THEME_ID,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      await db.themes.bulkPut(themes);
+      await db.items.bulkPut(fresh);
+      await db.setlists.put(setlist);
+      await db.meta.put({ key: SEED_KEY, value: SEED_VERSION });
+      return fresh.length;
+    }
+
+    // An upgrade: never duplicate a title the parish already has, whoever wrote it.
+    const taken = new Set((await db.items.toArray()).map((i) => i.title));
+    const added = fresh.filter((i) => !taken.has(i.title));
+    await db.items.bulkPut(added);
+    await db.meta.put({ key: SEED_KEY, value: SEED_VERSION });
+    return added.length;
   });
 }

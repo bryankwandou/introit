@@ -1,6 +1,12 @@
 import Dexie, { type EntityTable } from "dexie";
 import type { LibraryItem, MediaAsset, Setlist, Theme } from "./types";
 
+/** Small key/value facts about this install, such as which seed bundles it has seen. */
+export interface MetaRow {
+  key: string;
+  value: number;
+}
+
 /**
  * Everything lives in IndexedDB on the operator's machine. There is no server call
  * anywhere in the presentation path — a church with a dead uplink still runs a service.
@@ -10,6 +16,7 @@ class IntroitDB extends Dexie {
   setlists!: EntityTable<Setlist, "id">;
   themes!: EntityTable<Theme, "id">;
   media!: EntityTable<MediaAsset, "id">;
+  meta!: EntityTable<MetaRow, "key">;
 
   constructor() {
     super("introit");
@@ -19,6 +26,8 @@ class IntroitDB extends Dexie {
       themes: "id, name, createdAt",
       media: "id, name, mime, createdAt",
     });
+    // v2 only adds a table; nothing already stored is touched.
+    this.version(2).stores({ meta: "key" });
   }
 }
 

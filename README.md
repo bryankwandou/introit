@@ -12,8 +12,14 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
   Window Management API, dengan jendela biasa sebagai cadangan.
 - **Tanpa jaringan.** Seluruh pustaka duduk di IndexedDB peramban. Tidak ada satu pun
   permintaan ke server di jalur penayangan.
-- **Ordinarium Misa bawaan.** Tanda Salib sampai Berkat dalam bahasa Indonesia, sudah
-  terpotong per salindia.
+- **Ordinarium Misa bawaan, lengkap dengan jawaban umat.** Tanda Salib sampai Berkat,
+  ditambah bagian umat di sela-selanya: jawaban bacaan dan Injil, Doa Umat, ajakan
+  berdoa atas persembahan, dialog Prefasi, aklamasi anamnesis, doksologi, salam damai,
+  dan "Ya Tuhan, saya tidak pantas". Teks mengikuti TPE 2020, seruan dan jawaban di
+  salindia terpisah, dan semuanya bisa disunting kalau paroki memakai rumusan lain.
+- **Pustaka bawaan yang ikut bertambah.** Isi bawaan dikirim dalam bundel bernomor.
+  Paroki yang sudah lama memakai Introit tetap menerima doa baru, tanpa menimpa butir
+  yang sudah disunting dan tanpa memunculkan lagi butir yang sengaja dihapus.
 - **Pustaka yang bisa dicari sampai ke baris lirik**, lengkap dengan label dan koleksi.
 - **Tata ibadat** dengan penyusunan ulang lewat seret-lepas dan catatan khusus operator.
 - **Tema per butir**: satu lagu boleh tampil di atas fotonya sendiri sementara sisa
