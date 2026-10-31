@@ -144,8 +144,9 @@ export function SetlistPane() {
                 >
                   <div
                     onClick={() => openItem(item.id)}
+                    title={item.title}
                     className={cn(
-                      "flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2",
+                      "relative flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2",
                       activeItemId === item.id
                         ? "bg-raised"
                         : "hover:bg-raised/60",
@@ -161,7 +162,9 @@ export function SetlistPane() {
                       {index + 1}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-fg">{item.title}</p>
+                      <p className="line-clamp-2 text-sm leading-snug break-words text-fg">
+                        {item.title}
+                      </p>
                       {entry.note && (
                         <p className="truncate font-mono text-[10px] text-gold/80">
                           {entry.note}
@@ -171,7 +174,9 @@ export function SetlistPane() {
                     {isLive && (
                       <span className="size-1.5 shrink-0 rounded-full bg-live" />
                     )}
-                    <div className="flex shrink-0 items-center opacity-0 transition-opacity group-hover:opacity-100">
+                    {/* Floats over the row instead of reserving width, so long titles keep their
+                        room. Opacity, not display, hides it: the buttons stay reachable by Tab. */}
+                    <div className="pointer-events-none absolute top-1/2 right-1 flex -translate-y-1/2 items-center rounded-md border border-line bg-raised opacity-0 shadow-sm transition-opacity group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
                       <button
                         title="Catatan operator"
                         onClick={(e) => {
