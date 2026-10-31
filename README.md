@@ -35,6 +35,9 @@ punya laptop seadanya, jaringan yang kadang mati, dan misa yang tetap harus jala
   BroadcastChannel.
 - **Monitor panggung** di `/stage` untuk pemusik dan lektor: bait yang tayang, bait
   berikutnya, jam dinding, dan tidak ada satu pun kendali.
+- **Pesan panggung** yang hanya muncul di monitor pemusik dan lektor: "Ulangi reff",
+  "Bait terakhir", "Lektor bersiap", atau ketik sendiri lalu `Enter`. Muncul sebagai pita
+  kuning yang berkedip dua kali, dan tidak pernah sampai ke proyektor umat atau siaran.
 - **Peralihan salindia** yang menyilangkan bait lama dan baru, panjangnya diatur per
   tema dan bisa dimatikan sama sekali untuk potong langsung.
 - **Hitung mundur pra-ibadat** yang memakai warna tema yang sedang dipakai.

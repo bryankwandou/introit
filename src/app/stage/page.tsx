@@ -58,6 +58,18 @@ export default function StagePage() {
         </span>
       </header>
 
+      {state.stageMessage && (
+        <p
+          // Keyed on the text so a new message blinks again, but a repeat frame does not.
+          key={state.stageMessage}
+          role="status"
+          className="mt-[1.5vh] shrink-0 rounded-[1vh] bg-[#FFC21A] px-[2vh] py-[1.4vh] text-center text-[4.6vh] leading-tight font-bold text-black"
+          style={{ animation: "introit-flash 900ms ease-in-out 1" }}
+        >
+          {state.stageMessage}
+        </p>
+      )}
+
       <section className="flex min-h-0 flex-[3] items-center justify-center py-[2vh]">
         {cleared ? (
           <p className="font-mono text-[3vh] tracking-widest text-white/25 uppercase">

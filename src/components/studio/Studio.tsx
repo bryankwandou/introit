@@ -58,6 +58,8 @@ export function Studio() {
     tickerOn,
     quick,
     quickOn,
+    stageMsg,
+    stageMsgOn,
     countdownTo,
     countdownLabel,
     editing,
@@ -156,7 +158,9 @@ export function Studio() {
     const typed = quickOn && quick.trim() ? quick.trim() : null;
     const text = typed ?? (logoBlank ? null : (liveSlide?.text ?? null));
     const frame: StageState = {
-      revision: ++revision.current,
+      // Time-based so a reloaded studio still outranks frames from before the reload,
+      // which receivers would otherwise discard as stale.
+      revision: (revision.current = Math.max(revision.current + 1, Date.now())),
       visible: true,
       text,
       theme,
@@ -169,6 +173,7 @@ export function Studio() {
       nowTitle: typed ? "Teks cepat" : liveItem?.title,
       nowTag: typed ? undefined : liveSlide?.tag,
       nextText: nextSlide?.text ?? null,
+      stageMessage: stageMsgOn && stageMsg.trim() ? stageMsg.trim() : undefined,
     };
     linkRef.current?.send(frame);
   }, [
@@ -180,6 +185,8 @@ export function Studio() {
     tickerOn,
     quick,
     quickOn,
+    stageMsg,
+    stageMsgOn,
     blackout,
     logoBlank,
     countdownTo,

@@ -21,6 +21,8 @@ type Listener = (state: StageState) => void;
 export class StageLink {
   private channel: BroadcastChannel | null = null;
   private listeners = new Set<Listener>();
+  /** Highest revision seen, so a late echo of an older frame is dropped. */
+  private seen = -1;
 
   constructor() {
     if (typeof window === "undefined") return;
@@ -34,7 +36,13 @@ export class StageLink {
         if (snap) this.channel?.postMessage(snap);
         return;
       }
-      this.listeners.forEach((l) => l(data as StageState));
+      const frame = data as StageState;
+      // Every open window answers a newcomer's hello with its stored snapshot, and those
+      // answers can land after the operator's next frame. Without this check one late
+      // echo rolls every screen back, wiping a quick text or a stage message.
+      if (frame.revision <= this.seen) return;
+      this.seen = frame.revision;
+      this.listeners.forEach((l) => l(frame));
     };
   }
 
@@ -46,6 +54,11 @@ export class StageLink {
       // Private-mode or quota failure must never stop the service.
     }
     this.channel?.postMessage(state);
+  }
+
+  /** Seeds the staleness check with a frame the window already painted. */
+  markSeen(revision: number) {
+    this.seen = Math.max(this.seen, revision);
   }
 
   /** Called by an output window on mount. */
@@ -91,6 +104,7 @@ function attach(): void {
   if (receiver) return;
   receiver = new StageLink();
   latest = receiver.readSnapshot();
+  if (latest) receiver.markSeen(latest.revision);
   receiver.subscribe((frame) => {
     latest = frame;
     watchers.forEach((notify) => notify());

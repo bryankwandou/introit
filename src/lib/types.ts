@@ -148,4 +148,9 @@ export interface StageState {
   nowTag?: string;
   /** Text of the slide queued after the live one, for the monitor. */
   nextText?: string | null;
+  /**
+   * A note for the musicians and readers only, e.g. "Ulangi reff". The projector and the
+   * broadcast key never read this field, so it cannot reach the congregation.
+   */
+  stageMessage?: string;
 }

@@ -105,6 +105,19 @@ body:has(.studio-root) {
 
 /* Slide changes on the projector: the outgoing line thins out under the new one,
    which reads far calmer from the back of a nave than a hard cut. */
+/* Two blinks when a stage message lands, so a musician reading a chart looks up. */
+@keyframes introit-flash {
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+  }
+  25%,
+  75% {
+    opacity: 0.25;
+  }
+}
+
 @keyframes introit-enter {
   from {
     opacity: 0;

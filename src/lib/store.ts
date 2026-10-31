@@ -25,6 +25,9 @@ interface PresenterState {
   /** Typed straight onto the screen, ahead of whatever slide is live. */
   quick: string;
   quickOn: boolean;
+  /** For the stage monitor only. */
+  stageMsg: string;
+  stageMsgOn: boolean;
   /** Epoch ms the pre-service clock ends at; undefined once it is dismissed. */
   countdownTo?: number;
   countdownLabel: string;
@@ -47,6 +50,10 @@ interface PresenterState {
   setTicker: (t: string) => void;
   toggleTicker: () => void;
   setQuick: (t: string) => void;
+  setStageMsg: (t: string) => void;
+  /** Sends the given text, or whatever is typed when called without one. */
+  sendStageMsg: (t?: string) => void;
+  clearStageMsg: () => void;
   showQuick: () => void;
   hideQuick: () => void;
   startCountdown: (minutes: number) => void;
@@ -69,6 +76,8 @@ export const usePresenter = create<PresenterState>((set) => ({
   tickerOn: false,
   quick: "",
   quickOn: false,
+  stageMsg: "",
+  stageMsgOn: false,
   countdownLabel: "Misa segera dimulai",
   search: "",
   showShortcuts: false,
@@ -87,6 +96,10 @@ export const usePresenter = create<PresenterState>((set) => ({
   setTicker: (ticker) => set({ ticker }),
   toggleTicker: () => set((s) => ({ tickerOn: !s.tickerOn })),
   setQuick: (quick) => set({ quick }),
+  setStageMsg: (stageMsg) => set({ stageMsg }),
+  sendStageMsg: (t) =>
+    set((s) => ({ stageMsg: t ?? s.stageMsg, stageMsgOn: Boolean((t ?? s.stageMsg).trim()) })),
+  clearStageMsg: () => set({ stageMsgOn: false }),
   // Showing it also lifts a blackout: an operator typing a car plate under pressure
   // means "put this on the wall", not "put it behind a black rectangle".
   showQuick: () => set({ quickOn: true, blackout: false }),

@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Eye,
   Megaphone,
+  MessageSquareText,
   MonitorOff,
   Palette,
   SquareSlash,
@@ -17,6 +18,15 @@ import { useThemes } from "@/lib/hooks";
 import { usePresenter } from "@/lib/store";
 import type { ResolvedSlide } from "@/lib/slides";
 import type { Theme } from "@/lib/types";
+
+/** The cues a parish music team actually needs mid-Mass; anything else is typed. */
+const STAGE_PRESETS = [
+  "Ulangi reff",
+  "Satu bait lagi",
+  "Bait terakhir",
+  "Lebih pelan",
+  "Lektor bersiap",
+];
 
 interface Props {
   theme: Theme;
@@ -66,6 +76,11 @@ export function LiveRail({
     setQuick,
     showQuick,
     hideQuick,
+    stageMsg,
+    stageMsgOn,
+    setStageMsg,
+    sendStageMsg,
+    clearStageMsg,
   } = usePresenter();
   const themes = useThemes();
 
@@ -217,6 +232,61 @@ export function LiveRail({
               Turunkan
             </Button>
           </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider text-muted uppercase">
+              <MessageSquareText className="size-3" /> Pesan panggung
+            </span>
+            {stageMsgOn ? (
+              <button
+                onClick={clearStageMsg}
+                className="cursor-pointer font-mono text-[10px] text-gold hover:text-gold-bright"
+                title="Hapus pesan dari monitor panggung"
+              >
+                hapus
+              </button>
+            ) : (
+              <span className="font-mono text-[10px] text-muted/70">hanya pemusik</span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {STAGE_PRESETS.map((p) => (
+              <button
+                key={p}
+                onClick={() => sendStageMsg(p)}
+                className={cn(
+                  "cursor-pointer rounded-md border px-2 py-1 text-[11px] transition-colors",
+                  stageMsgOn && stageMsg === p
+                    ? "border-gold text-gold"
+                    : "border-line text-muted hover:border-muted hover:text-fg",
+                )}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <input
+            value={stageMsg}
+            onChange={(e) => setStageMsg(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                sendStageMsg();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                clearStageMsg();
+              }
+            }}
+            placeholder="Ketik pesan, Enter untuk kirim"
+            className="w-full rounded-lg border border-line bg-ink px-3 py-2 text-xs text-fg placeholder:text-muted/70 focus:border-gold focus:outline-none"
+          />
+          {stageMsgOn && stageMsg.trim() && (
+            <p className="rounded-md bg-[#FFC21A] px-2 py-1 text-center text-[11px] font-semibold text-black">
+              {stageMsg.trim()}
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
